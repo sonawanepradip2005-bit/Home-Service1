@@ -69,13 +69,19 @@ exports.loginuser = async (req, res) => {
         const { email, password } = req.body;
 
         if (!email || !password) {
-            return res.status(400).send("plese fill the filled");
+            return res.status(400).json({
+                success : false,                
+                message :"plese fill the filled"
+            });
         }
 
         const userexist = await user.findOne({ email: email });
 
         if (!userexist) {
-            return res.status(400).send("user not found");
+            return res.status(400).json({
+                success : false,                
+                message :"user not foundd"
+            });
         }
         const isMatch = await bcrypt.compare(
             password,
@@ -83,7 +89,10 @@ exports.loginuser = async (req, res) => {
         );
 
         if (!isMatch) {
-            return res.status(400).send("Invalid user and password");
+            return res.status(400). json({
+                success : false,                
+                message :"Invalid user and password"
+            });;
         }
 
         const token = jwt.sign({
