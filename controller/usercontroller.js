@@ -230,8 +230,9 @@ exports.resetpass = async (req, res) => {
         users.password = hashpassword;
         await users.save();
 
-        otp = null;
-        otpExpire = null;
+        users.otp = null;
+        users.otpExpire = null;
+        await users.save();
 
         const transporter = nodemailer.createTransport({
             service: "gmail",
@@ -303,46 +304,51 @@ exports.editsignupuser = async (req, res) => {
             }
 
 
-            const userExist = await user.findByIdAndUpdate(userId, {
-                images: [
-            {
-                file: req.file.filename,
-                path: req.file.path
-            }
-        ],
+            const updateData = {
                 name: name,
                 email: email,
-                address : {
-                    city: req.body.city,
-                    zipCode: req.body.zipCode,
-                    state: req.body.state
+                address: {
+                    city: req.body.city || (address && address.city),
+                    zipCode: req.body.zipCode || (address && address.zipCode),
+                    state: req.body.state || (address && address.state)
                 },
-                
-                contact: contact,
-                password: password
-            })
-
-            if (!userExist) {
-                res.status(400).json({
-                    success: true,
-                    message: "User Not Found",
-                })
-            }
+                contact: contact
+            };
 
             if (req.file) {
-
-                userExist.images = {
-                    file: req.file.filename,
-                    path: req.file.path
-                };
-
+                updateData.images = [
+                    {
+                        file: req.file.filename,
+                        path: req.file.path
+                    }
+                ];
             }
 
-            res.status(200).json({
+            if (password) {
+                updateData.password = await bcrypt.hash(password, 10);
+            }
+
+            const userExist = await user.findByIdAndUpdate(userId, updateData, { new: true });
+
+            if (!userExist) {
+                return res.status(404).json({
+                    success: false,
+                    message: "User Not Found",
+                });
+            }
+
+            return res.status(200).json({
                 success: true,
                 message: "Successfully Edit User",
-                user: userExist
-            })
+                user: {
+                    _id: userExist._id,
+                    name: userExist.name,
+                    email: userExist.email,
+                    address: userExist.address,
+                    contact: userExist.contact,
+                    images: userExist.images
+                }
+            });
 
         } catch (err) {
     console.log("EDIT USER ERROR =", err);
@@ -388,8 +394,7 @@ exports.getUserById = async (req, res) => {
                     zipCode: userData.address?.zipCode || "",
                     state: userData.address?.state || ""
                 },
-                images: userData.images || [],
-                password :userData.password || ""
+                images: userData.images || []
             }
         });
 
