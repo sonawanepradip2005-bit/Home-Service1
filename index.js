@@ -16,6 +16,12 @@ app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+app.get("/", (req, res) => {
+  res.status(200).json({
+    message: "Express server is running",
+  });
+});
 app.get("/check", (req, res) => {
     res.json({
         sucess: "api is run"
