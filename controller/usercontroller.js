@@ -37,24 +37,26 @@ exports.signupuser = async (req, res) => {
             contact,
             password: hashPassword
         })
+        try {
+            const transporter = nodemailer.createTransport({
+                service: "gmail",
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASS
+                }
+            });
 
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            }
-        });
-
-        await transporter.sendMail({
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: "user password created",
-            html: `<h1> name : ${email},
+            await transporter.sendMail({
+                from: process.env.EMAIL_USER,
+                to: email,
+                subject: "user password created",
+                html: `<h1> name : ${email},
             <h2> password : ${password}`
-        })
+            })
 
-
+        } catch (error) {
+            console.log(error);
+        }
         return res.status(200).json({
             success: true,
             message: "Registration successful"
@@ -244,24 +246,26 @@ exports.resetpass = async (req, res) => {
         users.otp = null;
         users.otpExpire = null;
         await users.save();
+        try {
+            const transporter = nodemailer.createTransport({
+                service: "gmail",
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASS,
+                },
+            });
 
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
-            },
-        });
-
-        await transporter.sendMail({
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: "Password Reset Successfully",
-            html: `
+            await transporter.sendMail({
+                from: process.env.EMAIL_USER,
+                to: email,
+                subject: "Password Reset Successfully",
+                html: `
         <h1>Password Reset Successfully</h1>
         <p>Your password has been changed successfully.</p> `,
-        });
-
+            });
+        } catch (error) {
+            console.log(error);
+        }
         return res.status(200).json({
             success: true,
             message: "Password reset successfully",
