@@ -70,8 +70,8 @@ exports.loginuser = async (req, res) => {
 
         if (!email || !password) {
             return res.status(400).json({
-                success : false,                
-                message :"plese fill the filled"
+                success: false,
+                message: "plese fill the filled"
             });
         }
 
@@ -79,8 +79,8 @@ exports.loginuser = async (req, res) => {
 
         if (!userexist) {
             return res.status(400).json({
-                success : false,                
-                message :"user not foundd"
+                success: false,
+                message: "user not foundd"
             });
         }
         const isMatch = await bcrypt.compare(
@@ -89,9 +89,9 @@ exports.loginuser = async (req, res) => {
         );
 
         if (!isMatch) {
-            return res.status(400). json({
-                success : false,                
-                message :"Invalid user and password"
+            return res.status(400).json({
+                success: false,
+                message: "Invalid user and password"
             });;
         }
 
@@ -135,26 +135,28 @@ exports.forgotpassword = async (req, res) => {
         users.otpExpire = Date.now() + 5 * 60 * 1000;
 
         await users.save();
+        try {
+            const transporter = nodemailer.createTransport({
+                service: "gmail",
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASS
+                }
+            });
 
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            }
-        });
-
-        await transporter.sendMail({
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: "Reset Password OTP",
-            html: `
+            await transporter.sendMail({
+                from: process.env.EMAIL_USER,
+                to: email,
+                subject: "Reset Password OTP",
+                html: `
                 <h1>Reset Password</h1>
                 <h2>Your OTP is: ${otp}</h2>
                 <p>This OTP will expire in 5 minutes.</p>
             `
-        });
-
+            });
+        } catch (error) {
+            console, log(error);
+        }
         return res.status(200).json({
             success: true,
             message: "OTP Sent Successfully"
@@ -360,13 +362,13 @@ exports.editsignupuser = async (req, res) => {
             });
 
         } catch (err) {
-    console.log("EDIT USER ERROR =", err);
+            console.log("EDIT USER ERROR =", err);
 
-    res.status(500).json({
-        success: false,
-        message: err.message
-    });
-}
+            res.status(500).json({
+                success: false,
+                message: err.message
+            });
+        }
     })
 };
 exports.getUserById = async (req, res) => {
@@ -380,10 +382,10 @@ exports.getUserById = async (req, res) => {
             });
         }
 
-   
+
         const userData = await user.findById(userId);
 
-   
+
         if (!userData) {
             return res.status(404).json({
                 success: false,
@@ -446,10 +448,10 @@ exports.changepassword = async (req, res) => {
             });
         }
 
-            const isMatch = await bcrypt.compare(
-                currentPassword,
-                userData.password
-            )
+        const isMatch = await bcrypt.compare(
+            currentPassword,
+            userData.password
+        )
 
         if (!isMatch) {
             return res.status(400).json({
