@@ -1,23 +1,11 @@
-
 const mongoose = require("mongoose");
 
 const houseDetailsSchema = new mongoose.Schema(
     {
         houseSize: {
             type: String,
-            enum: [
-                "2 Bedrooms 1 Kitchen",
-                "3 Bedrooms 1 Kitchen",
-                "4 Bedrooms 2 Kitchen",
-                "Small Office",
-                "Large Office",
-                "Multiple Office",
-                "Small (0-50 Sqftr)",
-                "Medium (50-200 sqft)",
-                "Large (200 Sqft+)",
-                "Custom"
-            ],
-            required: false
+            required: true,
+            trim: true
         },
         customHouseSize: { type: String, default: "" },
         price: { type: Number, required: true, min: 0 }
@@ -38,7 +26,7 @@ const officeDetailsSchema = new mongoose.Schema(
 
 const commercialDetailsSchema = new mongoose.Schema(
     {
-        commercialSize: { type: String, required: true, trim: true },
+        commercialSize: { type: String, default: "", trim: true },
         floorSize: { type: String, default: "" },
         industryType: { type: String, default: "" },
         notes: { type: String, default: "" },
@@ -51,7 +39,7 @@ const orderSchema = new mongoose.Schema(
     {
         userId: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
+            ref: "user",
             required: true
         },
 
@@ -87,26 +75,17 @@ const orderSchema = new mongoose.Schema(
 
         houseDetails: {
             type: houseDetailsSchema,
-            default: undefined,
-            required: function () {
-                return this.bookingType === "home";
-            }
+            default: undefined
         },
 
         officeDetails: {
             type: officeDetailsSchema,
-            default: undefined,
-            required: function () {
-                return this.bookingType === "office";
-            }
+            default: undefined
         },
 
         commercialDetails: {
             type: commercialDetailsSchema,
-            default: undefined,
-            required: function () {
-                return this.bookingType === "commercial";
-            }
+            default: undefined
         },
 
         furnitureDetails: {
@@ -114,7 +93,7 @@ const orderSchema = new mongoose.Schema(
                 type: [
                     {
                         name: { type: String, required: true, trim: true },
-                        quantity: { type: Number, default: 1, min: 1 },
+                        quantity: { type: Number, default: 1, min: 0 },
                         price: { type: Number, required: true, min: 0 }
                     }
                 ],
