@@ -1,32 +1,79 @@
-
 const mongoose = require("mongoose");
 
 const orderServiceSchema = new mongoose.Schema(
     {
-        houseSize: {
-            type: String,
-            enum: [
-                "2 Bedrooms 1 Kitchen",
-                "3 Bedrooms 1 Kitchen",
-                "4 Bedrooms 1 Kitchen",
-                "Custom"
-            ],
-            required: false
-        },
-        customHouseSize: { type: String, default: "" },
-        price: { type: Number, required: true, min: 0 },
-
         userId: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
+            ref: "user",
             required: true
+        },
+
+        serviceType: {
+            type: String,
+            default: "service",
+            trim: true
         },
 
         bookingType: {
             type: String,
-            enum: ["home", "office", "commercial"],
+            enum: ["home", "office", "commercial", "service"],
             default: "home",
             required: true
+        },
+
+        houseSize: {
+            type: String,
+            default: "",
+            trim: true
+        },
+
+        customHouseSize: {
+            type: String,
+            default: "",
+            trim: true
+        },
+
+        price: {
+            type: Number,
+            required: true,
+            min: 0,
+            default: 1000
+        },
+
+        vehicle: {
+            type: String,
+            default: "",
+            trim: true
+        },
+
+        workingtime: {
+            type: String,
+            default: "",
+            trim: true
+        },
+
+        selectedColor: {
+            type: String,
+            default: "",
+            trim: true
+        },
+
+        floorSize: {
+            type: String,
+            default: "",
+            trim: true
+        },
+
+        industryType: {
+            type: String,
+            default: "",
+            trim: true
+        },
+
+        notes: {
+            type: String,
+            default: "",
+            trim: true
         },
 
         pickupLocation: {
@@ -57,11 +104,13 @@ const orderServiceSchema = new mongoose.Schema(
             workerPrice: { type: Number, default: 0, min: 0 },
             totalPrice: { type: Number, default: 0, min: 0 }
         },
-        
-        workingHoursDetails : {
-            workingHourse : {type : Number,default : 0,min : 0},
-            workingHoursePrice : { type : Number, default : 0, min : 0}
+
+        workingHoursDetails: {
+            workingHourse: { type: Number, default: 0, min: 0 },
+            workingHoursePrice: { type: Number, default: 0, min: 0 },
+            totalPrice: { type: Number, default: 0, min: 0 }
         },
+
         serviceCharge: { type: Number, default: 0, min: 0 },
         discountAmount: { type: Number, default: 0, min: 0 },
         promoCode: { type: String, default: "" },
